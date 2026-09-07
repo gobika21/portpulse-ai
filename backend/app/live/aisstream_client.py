@@ -107,7 +107,7 @@ class VesselCache:
             "last_seen": time.monotonic(),
         }
 
-    def snapshot(self, port_id: str) -> dict:
+    def snapshot(self, port_id: str, include_positions: bool = False) -> dict:
         now = time.monotonic()
         fresh = {
             mmsi: v for mmsi, v in self._vessels.get(port_id, {}).items()
@@ -117,8 +117,9 @@ class VesselCache:
 
         waiting = [v for v in fresh.values() if v["sog_knots"] < WAITING_SPEED_KNOTS]
         port_info = PORTS[port_id]
+        (lat_min, lon_min), (lat_max, lon_max) = port_info["bbox"]
 
-        return {
+        result = {
             "port_id": port_id,
             "port_name": port_info["name"],
             "country": port_info["country"],
@@ -127,11 +128,26 @@ class VesselCache:
             "vessels_observed": len(fresh),
             "source": "aisstream.io",
             "bounding_box": port_info["bbox"],
+            "center": [(lat_min + lat_max) / 2, (lon_min + lon_max) / 2],
             "coverage_note": port_info["note"],
             "connected": self.connected,
             "warming_up": self.connected and (now - self.started_at) < STALE_AFTER_SECONDS,
             "last_error": self.last_error,
         }
+
+        if include_positions:
+            result["ships"] = [
+                {
+                    "id": mmsi,
+                    "lat": v["lat"],
+                    "lon": v["lon"],
+                    "speed_knots": round(v["sog_knots"], 1),
+                    "waiting": v["sog_knots"] < WAITING_SPEED_KNOTS,
+                }
+                for mmsi, v in fresh.items()
+            ]
+
+        return result
 
     def all_snapshots(self) -> list[dict]:
         return [self.snapshot(port_id) for port_id in PORTS]
@@ -195,10 +211,10 @@ def stop_collector():
         _collector_task = None
 
 
-def get_live_vessel_queue(port_id: str) -> dict:
+def get_live_vessel_queue(port_id: str, include_positions: bool = False) -> dict:
     if port_id not in PORTS:
         raise AISStreamError(f"Unknown port_id '{port_id}'. Known ports: {list(PORTS)}")
-    return cache.snapshot(port_id)
+    return cache.snapshot(port_id, include_positions=include_positions)
 
 
 def get_all_live_vessel_queues() -> list[dict]:

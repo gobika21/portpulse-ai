@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardBody } from "@/components/ui/Card";
@@ -16,8 +17,14 @@ import { api, ApiError } from "@/lib/api";
 import { useLiveVesselQueue } from "@/lib/hooks";
 import type { AdvisoryResult, PortSnapshot } from "@/lib/types";
 
+// Leaflet touches `window` at import time, so it can only run in the browser.
+const ShipMap = dynamic(() => import("@/components/board/ShipMap").then((m) => m.ShipMap), {
+  ssr: false,
+  loading: () => <Skeleton className="h-[320px] w-full" />,
+});
+
 export function PortAdvisoryView({ portId }: { portId: string }) {
-  const { data: live, loading: liveLoading, error: liveError } = useLiveVesselQueue(portId);
+  const { data: live, loading: liveLoading, error: liveError } = useLiveVesselQueue(portId, true);
 
   const DEFAULT_FULL_PERCENT = 60;
   const DEFAULT_DELAY_HOURS = 8;
@@ -128,6 +135,8 @@ export function PortAdvisoryView({ portId }: { portId: string }) {
           </CardBody>
         </Card>
       </div>
+
+      {live.live_coverage && <ShipMap live={live} />}
 
       {running && (
         <Card>

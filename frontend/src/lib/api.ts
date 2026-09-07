@@ -25,8 +25,10 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
 export const api = {
   listPorts: () => request<PortSummary[]>("/live/ports"),
-  liveVesselQueue: (portId: string) =>
-    request<LiveVesselQueue>(`/live/vessel-queue?port=${encodeURIComponent(portId)}`),
+  liveVesselQueue: (portId: string, withPositions = false) =>
+    request<LiveVesselQueue>(
+      `/live/vessel-queue?port=${encodeURIComponent(portId)}${withPositions ? "&positions=true" : ""}`,
+    ),
   liveVesselQueueAll: () => request<LiveVesselQueue[]>("/live/vessel-queue/all"),
   runAdvisory: (snapshot: PortSnapshot) =>
     request<AdvisoryResult>("/advisory", { method: "POST", body: JSON.stringify(snapshot) }),

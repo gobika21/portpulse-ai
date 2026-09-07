@@ -9,6 +9,14 @@ export interface PortSummary {
   live_coverage: boolean;
 }
 
+export interface Ship {
+  id: string;
+  lat: number;
+  lon: number;
+  speed_knots: number;
+  waiting: boolean;
+}
+
 export interface LiveVesselQueue {
   port_id: string;
   port_name: string;
@@ -18,10 +26,12 @@ export interface LiveVesselQueue {
   vessels_observed: number;
   source: string;
   bounding_box: [[number, number], [number, number]];
+  center: [number, number];
   coverage_note: string;
   connected: boolean;
   warming_up: boolean;
   last_error: string | null;
+  ships?: Ship[];
 }
 
 export interface PortSnapshot {

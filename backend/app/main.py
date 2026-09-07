@@ -54,7 +54,7 @@ def live_ports():
 
 
 @app.get("/live/vessel-queue")
-def live_vessel_queue(port: str):
+def live_vessel_queue(port: str, positions: bool = False):
     """Live vessel-queue proxy via AIS (aisstream.io) for a single port.
 
     Berth occupancy and average waiting time are not publicly exposed by
@@ -63,9 +63,13 @@ def live_vessel_queue(port: str):
     report infrequently, so this reads from a continuously-updated
     background cache rather than blocking per request; `warming_up` is true
     until enough time has passed to reliably observe anchored vessels.
+
+    Pass `positions=true` to also include each tracked ship's live lat/lon
+    (for the map view) — omitted by default to keep the board-view payload
+    small.
     """
     try:
-        return get_live_vessel_queue(port)
+        return get_live_vessel_queue(port, include_positions=positions)
     except AISStreamError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 

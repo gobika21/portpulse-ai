@@ -41,7 +41,7 @@ export function useLiveVesselQueues() {
   return { ...state, refresh };
 }
 
-export function useLiveVesselQueue(portId: string) {
+export function useLiveVesselQueue(portId: string, withPositions = false) {
   const [state, setState] = useState<LiveQueryState<LiveVesselQueue>>({
     data: null,
     loading: true,
@@ -50,7 +50,7 @@ export function useLiveVesselQueue(portId: string) {
 
   const refresh = useCallback(async () => {
     try {
-      const data = await api.liveVesselQueue(portId);
+      const data = await api.liveVesselQueue(portId, withPositions);
       setState({ data, loading: false, error: null });
     } catch (e) {
       setState((prev) => ({
@@ -59,7 +59,7 @@ export function useLiveVesselQueue(portId: string) {
         error: e instanceof ApiError ? e.message : "Failed to load live port data",
       }));
     }
-  }, [portId]);
+  }, [portId, withPositions]);
 
   useEffect(() => {
     refresh();
