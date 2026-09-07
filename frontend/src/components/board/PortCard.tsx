@@ -24,7 +24,7 @@ export function PortCard({ port }: { port: LiveVesselQueue }) {
             ) : (
               <Badge tone="neutral">
                 <RadioTower className="h-3 w-3" strokeWidth={2} />
-                No coverage
+                No live data
               </Badge>
             )}
           </div>
@@ -34,10 +34,10 @@ export function PortCard({ port }: { port: LiveVesselQueue }) {
               <div className="text-2xl font-semibold tabular-nums text-ink">
                 {port.vessel_queue_length}
               </div>
-              <div className="text-xs text-ink-faint">vessels anchored / waiting</div>
+              <div className="text-xs text-ink-faint">ships waiting right now</div>
             </div>
             <span className="flex items-center gap-1 text-xs font-medium text-accent opacity-0 transition-opacity group-hover:opacity-100">
-              View advisory
+              See recommendations
               <ArrowRight className="h-3.5 w-3.5" />
             </span>
           </div>

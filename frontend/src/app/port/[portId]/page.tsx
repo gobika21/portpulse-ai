@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { Container } from "@/components/Container";
 import { PageHeading } from "@/components/PageHeading";
 import { PortAdvisoryView } from "@/components/advisory/PortAdvisoryView";
+import { TierLegend } from "@/components/board/TierLegend";
 
 export default async function PortPage({ params }: { params: Promise<{ portId: string }> }) {
   const { portId } = await params;
@@ -17,10 +18,11 @@ export default async function PortPage({ params }: { params: Promise<{ portId: s
         All ports
       </Link>
       <PageHeading
-        eyebrow="Congestion advisory"
-        title="Vessel queue → tier → stakeholder recommendations"
-        description="Monitoring, Classification, Decision-support, and Advisory-drafting agents run in sequence over this port's current signal."
+        eyebrow="Port status"
+        title="How congested is this port?"
+        description="We look at how many ships are waiting, check how serious it is, and write specific advice for the people who deal with this every day."
       />
+      <TierLegend />
       <PortAdvisoryView portId={portId} />
     </Container>
   );

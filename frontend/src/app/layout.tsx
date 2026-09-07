@@ -6,8 +6,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "PortPulse — Congestion Advisory",
-  description: "Live vessel congestion signals and agent-drafted advisories for major container ports.",
+  title: "PortPulse — Port Traffic Reports",
+  description: "See which major ports are backed up right now, and get plain-English advice on what to do about it.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

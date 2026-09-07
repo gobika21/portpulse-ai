@@ -10,7 +10,7 @@ export function Header() {
           <span className="text-[15px] font-semibold tracking-tight text-ink">PortPulse</span>
         </Link>
         <span className="rounded-sm bg-sunken px-2 py-0.5 text-xs font-medium text-ink-muted">
-          Congestion Advisory
+          Port Traffic Reports
         </span>
       </div>
     </header>

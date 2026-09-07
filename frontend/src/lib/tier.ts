@@ -8,7 +8,13 @@ export const TIER_STYLES: Record<CongestionTier, { text: string; bg: string; lab
 };
 
 export const PERSONA_LABELS: Record<Persona, string> = {
-  carrier: "Carrier",
+  carrier: "Shipping Company",
   trucking_company: "Trucking Company",
-  terminal_operator: "Terminal Operator",
+  terminal_operator: "Port Operator",
+};
+
+export const PERSONA_SUBTITLES: Record<Persona, string> = {
+  carrier: "Owns or runs the ships",
+  trucking_company: "Picks up containers by truck",
+  terminal_operator: "Runs the port itself",
 };

@@ -15,16 +15,17 @@ export function LiveSignalPanel({ live }: { live: LiveVesselQueue }) {
           ) : (
             <RadioTower className="h-4 w-4 text-ink-faint" strokeWidth={2} />
           )}
-          Live AIS signal
+          Live ship tracking
         </div>
         <p className="text-xs leading-relaxed text-ink-faint">{live.coverage_note}</p>
         <div className="grid grid-cols-2 gap-3">
-          <MetricTile label="Vessels observed" value={live.vessels_observed} />
-          <MetricTile label="Anchored / waiting" value={live.vessel_queue_length} />
+          <MetricTile label="Ships nearby" value={live.vessels_observed} />
+          <MetricTile label="Ships waiting" value={live.vessel_queue_length} />
         </div>
         {live.warming_up && live.live_coverage && (
           <p className="text-xs text-ink-faint">
-            Feed just connected — anchored vessels report roughly every 2–3 minutes, so this count fills in shortly.
+            We just started watching this port, so the count of waiting ships will fill in over the next couple of
+            minutes.
           </p>
         )}
       </CardBody>

@@ -1,6 +1,6 @@
 import { Ship, Truck, Warehouse, type LucideIcon } from "lucide-react";
 import { Card, CardBody } from "@/components/ui/Card";
-import { PERSONA_LABELS } from "@/lib/tier";
+import { PERSONA_LABELS, PERSONA_SUBTITLES } from "@/lib/tier";
 import type { Persona, Recommendation } from "@/lib/types";
 
 const PERSONA_ICONS: Record<Persona, LucideIcon> = {
@@ -24,11 +24,16 @@ export function AdvisoryCard({ recommendation, message }: AdvisoryCardProps) {
           <div className="flex h-8 w-8 items-center justify-center rounded-sm bg-accent-soft text-accent-hover">
             <Icon className="h-4 w-4" strokeWidth={1.75} />
           </div>
-          <span className="text-sm font-semibold text-ink">{PERSONA_LABELS[recommendation.persona]}</span>
+          <div>
+            <div className="text-sm font-semibold leading-tight text-ink">
+              {PERSONA_LABELS[recommendation.persona]}
+            </div>
+            <div className="text-xs text-ink-faint">{PERSONA_SUBTITLES[recommendation.persona]}</div>
+          </div>
         </div>
         <p className="text-sm leading-relaxed text-ink-muted">{message}</p>
         <p className="border-t border-border pt-3 text-xs leading-relaxed text-ink-faint">
-          <span className="font-medium text-ink-muted">Reasoning — </span>
+          <span className="font-medium text-ink-muted">Why — </span>
           {recommendation.reasoning}
         </p>
       </CardBody>
