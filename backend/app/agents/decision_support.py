@@ -1,6 +1,7 @@
 """Decision-support agent: Claude reasoning node producing per-persona recommendations."""
 
 import json
+import re
 
 from app.claude_client import ask_claude
 from app.models.schema import AdvisoryState
@@ -32,6 +33,11 @@ def decision_support_node(state: AdvisoryState) -> AdvisoryState:
     )
 
     raw = ask_claude(SYSTEM_PROMPT, user_prompt)
-    recommendations = json.loads(raw)
+    recommendations = json.loads(_strip_code_fence(raw))
 
     return {"recommendations": recommendations}
+
+
+def _strip_code_fence(text: str) -> str:
+    match = re.search(r"```(?:json)?\s*(.*?)\s*```", text, re.DOTALL)
+    return match.group(1) if match else text

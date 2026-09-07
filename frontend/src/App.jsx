@@ -45,16 +45,63 @@ export default function App() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [liveLoading, setLiveLoading] = useState(false);
+  const [liveInfo, setLiveInfo] = useState(null);
+  const [liveError, setLiveError] = useState(null);
+  const [proofLoading, setProofLoading] = useState(false);
+  const [proofInfo, setProofInfo] = useState(null);
+  const [proofError, setProofError] = useState(null);
 
   function pickScenario(key) {
     setScenarioKey(key);
     setSnapshot(SCENARIOS.find(s=>s.key===key).snapshot);
     setResult(null);
     setError(null);
+    setLiveInfo(null);
+    setLiveError(null);
   }
 
   function updateField(field, value) {
     setSnapshot(prev => ({ ...prev, [field]: value }));
+    setScenarioKey(null);
+    setLiveInfo(null);
+  }
+
+  async function useLiveData() {
+    setLiveLoading(true);
+    setLiveError(null);
+    try {
+      const res = await fetch(`${API_URL}/live/vessel-queue`);
+      if (!res.ok) {
+        const body = await res.json().catch(()=>({}));
+        throw new Error(body.detail || `Request failed (${res.status})`);
+      }
+      const live = await res.json();
+      setSnapshot(prev => ({ ...prev, vessel_queue_length: live.vessel_queue_length }));
+      setScenarioKey(null);
+      setLiveInfo(live);
+    } catch (e) {
+      setLiveError(e.message || "Failed to reach the live AIS feed");
+    } finally {
+      setLiveLoading(false);
+    }
+  }
+
+  async function fetchLiveProof() {
+    setProofLoading(true);
+    setProofError(null);
+    try {
+      const res = await fetch(`${API_URL}/live/vessel-queue?port=rotterdam`);
+      if (!res.ok) {
+        const body = await res.json().catch(()=>({}));
+        throw new Error(body.detail || `Request failed (${res.status})`);
+      }
+      setProofInfo(await res.json());
+    } catch (e) {
+      setProofError(e.message || "Failed to reach the live AIS feed");
+    } finally {
+      setProofLoading(false);
+    }
   }
 
   async function runAdvisory() {
@@ -93,6 +140,28 @@ export default function App() {
           Monitoring → Classification → Decision-support → Advisory-drafting — a 4-agent pipeline over live port metrics.
         </div>
 
+        {/* Live AIS proof-of-capability panel */}
+        <div style={{ background:T.panel, border:`1px solid ${T.border}`, borderRadius:10, padding:"12px 14px", display:"flex", flexDirection:"column", gap:8 }}>
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:8 }}>
+            <div style={{ fontSize:12, fontWeight:600 }}>📡 Live AIS Integration — Proof of Capability</div>
+            <button onClick={fetchLiveProof} disabled={proofLoading} style={{
+              padding:"4px 12px", borderRadius:6, border:`1px solid ${T.borderLt}`, cursor:proofLoading?"not-allowed":"pointer",
+              background:"transparent", color:T.muted, fontSize:11,
+            }}>{proofLoading ? "Connecting…" : "Check Rotterdam live feed"}</button>
+          </div>
+          <div style={{ fontSize:11, color:T.subtle, lineHeight:1.5 }}>
+            DP World doesn't expose a public API, and the free AIS network (aisstream.io) has no confirmed receiver
+            coverage in the Persian Gulf — so Jebel Ali's live feed above will typically show 0 vessels. This panel
+            proves the same live pipeline works where free coverage exists (Rotterdam has dense volunteer AIS receivers).
+          </div>
+          {proofError && <div style={{ fontSize:11, color:T.red }}>⚠️ {proofError}</div>}
+          {proofInfo && (
+            <div style={{ fontSize:12, color:T.green }}>
+              ✓ Live: {proofInfo.vessels_observed} vessels observed near {proofInfo.port_name}, {proofInfo.vessel_queue_length} anchored/waiting right now.
+            </div>
+          )}
+        </div>
+
         {/* Scenario picker */}
         <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
           {SCENARIOS.map(s => (
@@ -113,11 +182,18 @@ export default function App() {
               onChange={e=>updateField("berth_occupancy_rate", parseFloat(e.target.value))}
               style={{ width:"100%", background:T.surface, border:`1px solid ${T.borderLt}`, borderRadius:6, padding:"6px 8px", color:T.text, fontSize:14 }}/>
           </div>
-          <div style={{ background:T.panel, border:`1px solid ${T.border}`, borderRadius:10, padding:"12px 14px", flex:1, minWidth:160 }}>
-            <div style={{ fontSize:10, color:T.muted, textTransform:"uppercase", letterSpacing:"0.06em", marginBottom:6 }}>Vessel Queue Length</div>
+          <div style={{ background:T.panel, border:`1px solid ${liveInfo ? T.accent : T.border}`, borderRadius:10, padding:"12px 14px", flex:1, minWidth:160 }}>
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:6 }}>
+              <div style={{ fontSize:10, color:T.muted, textTransform:"uppercase", letterSpacing:"0.06em" }}>Vessel Queue Length</div>
+              {liveInfo && <span style={{ fontSize:9, fontWeight:700, color:T.accentLt }}>● LIVE</span>}
+            </div>
             <input type="number" min="0" value={snapshot.vessel_queue_length}
               onChange={e=>updateField("vessel_queue_length", parseInt(e.target.value || "0", 10))}
-              style={{ width:"100%", background:T.surface, border:`1px solid ${T.borderLt}`, borderRadius:6, padding:"6px 8px", color:T.text, fontSize:14 }}/>
+              style={{ width:"100%", background:T.surface, border:`1px solid ${T.borderLt}`, borderRadius:6, padding:"6px 8px", color:T.text, fontSize:14, marginBottom:8 }}/>
+            <button onClick={useLiveData} disabled={liveLoading} style={{
+              width:"100%", padding:"5px 8px", borderRadius:6, border:`1px solid ${T.accent}`, cursor:liveLoading?"not-allowed":"pointer",
+              background:"transparent", color:T.accentLt, fontSize:11, fontWeight:600,
+            }}>{liveLoading ? "Fetching AIS…" : "📡 Use Live Data (Jebel Ali)"}</button>
           </div>
           <div style={{ background:T.panel, border:`1px solid ${T.border}`, borderRadius:10, padding:"12px 14px", flex:1, minWidth:160 }}>
             <div style={{ fontSize:10, color:T.muted, textTransform:"uppercase", letterSpacing:"0.06em", marginBottom:6 }}>Avg Waiting Time (hrs)</div>
@@ -126,6 +202,19 @@ export default function App() {
               style={{ width:"100%", background:T.surface, border:`1px solid ${T.borderLt}`, borderRadius:6, padding:"6px 8px", color:T.text, fontSize:14 }}/>
           </div>
         </div>
+
+        {liveError && (
+          <div style={{ background:T.redDim, border:`1px solid ${T.red}`, borderRadius:8, padding:"10px 14px", fontSize:12, color:T.red }}>
+            ⚠️ Live data unavailable: {liveError}
+          </div>
+        )}
+        {liveInfo && (
+          <div style={{ background:T.accentDim, border:`1px solid ${T.accent}`, borderRadius:8, padding:"10px 14px", fontSize:12, color:T.accentLt }}>
+            📡 Live AIS feed near Jebel Ali (aisstream.io): {liveInfo.vessels_observed} vessels observed, {liveInfo.vessel_queue_length} anchored/waiting.
+            {liveInfo.warming_up && " Feed just started — anchored vessels report every ~2-3 min, so this count will fill in shortly."}
+            {" "}Berth occupancy &amp; avg waiting time aren't publicly available from DP World, so those stay manual/estimated.
+          </div>
+        )}
 
         <button onClick={runAdvisory} disabled={loading} style={{
           alignSelf:"flex-start", padding:"9px 20px", borderRadius:8, border:"none", cursor:loading?"not-allowed":"pointer",
