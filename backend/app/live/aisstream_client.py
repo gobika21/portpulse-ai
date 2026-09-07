@@ -42,15 +42,40 @@ STALE_AFTER_SECONDS = 8 * 60
 RECONNECT_DELAY_SECONDS = 5
 
 PORTS = {
-    "jebel_ali": {
-        "name": "Jebel Ali",
-        "bbox": [[24.90, 54.95], [25.05, 55.10]],
-        "note": "No confirmed free AIS receiver coverage in this region — expect 0 vessels.",
-    },
     "rotterdam": {
         "name": "Rotterdam",
+        "country": "Netherlands",
         "bbox": [[51.85, 3.95], [52.00, 4.15]],
-        "note": "Live capability proof — dense volunteer AIS receiver coverage in this region.",
+        "live_coverage": True,
+        "note": "Dense volunteer AIS receiver coverage in this region.",
+    },
+    "singapore": {
+        "name": "Singapore",
+        "country": "Singapore",
+        "bbox": [[1.20, 103.60], [1.30, 103.90]],
+        "live_coverage": True,
+        "note": "Dense volunteer AIS receiver coverage in this region.",
+    },
+    "los_angeles": {
+        "name": "Los Angeles / Long Beach",
+        "country": "United States",
+        "bbox": [[33.70, -118.30], [33.79, -118.19]],
+        "live_coverage": True,
+        "note": "Dense volunteer AIS receiver coverage in this region.",
+    },
+    "antwerp": {
+        "name": "Antwerp",
+        "country": "Belgium",
+        "bbox": [[51.20, 4.20], [51.35, 4.45]],
+        "live_coverage": True,
+        "note": "Dense volunteer AIS receiver coverage in this region.",
+    },
+    "jebel_ali": {
+        "name": "Jebel Ali",
+        "country": "United Arab Emirates",
+        "bbox": [[24.90, 54.95], [25.05, 55.10]],
+        "live_coverage": False,
+        "note": "No confirmed free AIS receiver coverage in this region — expect 0 vessels.",
     },
 }
 
@@ -96,6 +121,8 @@ class VesselCache:
         return {
             "port_id": port_id,
             "port_name": port_info["name"],
+            "country": port_info["country"],
+            "live_coverage": port_info["live_coverage"],
             "vessel_queue_length": len(waiting),
             "vessels_observed": len(fresh),
             "source": "aisstream.io",
@@ -105,6 +132,9 @@ class VesselCache:
             "warming_up": self.connected and (now - self.started_at) < STALE_AFTER_SECONDS,
             "last_error": self.last_error,
         }
+
+    def all_snapshots(self) -> list[dict]:
+        return [self.snapshot(port_id) for port_id in PORTS]
 
 
 cache = VesselCache()
@@ -165,7 +195,18 @@ def stop_collector():
         _collector_task = None
 
 
-def get_live_vessel_queue(port_id: str = "jebel_ali") -> dict:
+def get_live_vessel_queue(port_id: str) -> dict:
     if port_id not in PORTS:
         raise AISStreamError(f"Unknown port_id '{port_id}'. Known ports: {list(PORTS)}")
     return cache.snapshot(port_id)
+
+
+def get_all_live_vessel_queues() -> list[dict]:
+    return cache.all_snapshots()
+
+
+def list_ports() -> list[dict]:
+    return [
+        {"port_id": port_id, "name": info["name"], "country": info["country"], "live_coverage": info["live_coverage"]}
+        for port_id, info in PORTS.items()
+    ]

@@ -1,16 +1,32 @@
-# PortPulse AI — Frontend
+# PortPulse — Web
 
-Standalone React (Vite) dashboard for the PortPulse congestion advisory pipeline. Separate from the existing `port-research-app` notebook frontend at the repo root.
+Next.js (App Router, TypeScript, Tailwind) dashboard for the PortPulse congestion advisory pipeline.
+
+## Structure
+
+```
+src/
+  app/                      routes (App Router)
+    page.tsx                port board (home)
+    port/[portId]/page.tsx  single port: live signal + advisory pipeline
+  components/
+    ui/                     generic primitives — Button, Card, Badge, TierBadge,
+                             MetricTile, NumberField, EmptyState, Skeleton, ErrorBanner
+    board/                  port board — PortCard, PortBoard, LiveSignalPanel
+    advisory/               advisory pipeline UI — PortAdvisoryView, AdvisoryCard
+  lib/
+    api.ts                  typed fetch client for the backend
+    types.ts                shared types (mirrors the backend Pydantic models)
+    tier.ts                 tier/persona display mappings
+    hooks.ts                live-data polling hooks
+```
 
 ## Setup
 
 ```bash
-cd frontend
 npm install
-cp .env.example .env   # set VITE_PORTPULSE_API_URL if not using the default
+cp .env.local.example .env.local   # set NEXT_PUBLIC_PORTPULSE_API_URL if not using the default
 npm run dev
 ```
 
-Open http://localhost:5174
-
-Requires the [backend](../backend) running at `VITE_PORTPULSE_API_URL` (defaults to `http://localhost:8000`).
+Open http://localhost:3000. Requires the [backend](../backend) running.
