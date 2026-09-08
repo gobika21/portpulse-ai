@@ -1,6 +1,9 @@
+"use client";
+
 import { Ship, Truck, Warehouse, type LucideIcon } from "lucide-react";
 import { Card, CardBody } from "@/components/ui/Card";
-import { PERSONA_LABELS, PERSONA_SUBTITLES } from "@/lib/tier";
+import { PERSONA_LABEL_KEYS, PERSONA_SUBTITLE_KEYS } from "@/lib/tier";
+import { useLocale } from "@/components/LocaleProvider";
 import type { Persona, Recommendation } from "@/lib/types";
 
 const PERSONA_ICONS: Record<Persona, LucideIcon> = {
@@ -15,6 +18,7 @@ interface AdvisoryCardProps {
 }
 
 export function AdvisoryCard({ recommendation, message }: AdvisoryCardProps) {
+  const { t } = useLocale();
   const Icon = PERSONA_ICONS[recommendation.persona];
 
   return (
@@ -26,14 +30,14 @@ export function AdvisoryCard({ recommendation, message }: AdvisoryCardProps) {
           </div>
           <div>
             <div className="text-sm font-semibold leading-tight text-ink">
-              {PERSONA_LABELS[recommendation.persona]}
+              {t(PERSONA_LABEL_KEYS[recommendation.persona])}
             </div>
-            <div className="text-xs text-ink-faint">{PERSONA_SUBTITLES[recommendation.persona]}</div>
+            <div className="text-xs text-ink-faint">{t(PERSONA_SUBTITLE_KEYS[recommendation.persona])}</div>
           </div>
         </div>
         <p className="text-sm leading-relaxed text-ink-muted">{message}</p>
         <p className="border-t border-border pt-3 text-xs leading-relaxed text-ink-faint">
-          <span className="font-medium text-ink-muted">Why — </span>
+          <span className="font-medium text-ink-muted">{t("why")}</span>
           {recommendation.reasoning}
         </p>
       </CardBody>

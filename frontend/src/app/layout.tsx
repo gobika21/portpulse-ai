@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Header } from "@/components/Header";
-import { DirectionProvider } from "@/components/DirectionProvider";
+import { LocaleProvider } from "@/components/LocaleProvider";
 import { PortBackground } from "@/components/PortBackground";
 import "./globals.css";
 
@@ -17,10 +17,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" dir="ltr" className={inter.variable} suppressHydrationWarning>
       <body className="min-h-screen bg-canvas font-sans text-ink antialiased">
         <PortBackground />
-        <DirectionProvider>
+        <LocaleProvider>
           <Header />
           <main>{children}</main>
-        </DirectionProvider>
+        </LocaleProvider>
       </body>
     </html>
   );

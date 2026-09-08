@@ -1,10 +1,14 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowRight, Radio, RadioTower } from "lucide-react";
 import { Card, CardBody } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
+import { useLocale } from "@/components/LocaleProvider";
 import type { LiveVesselQueue } from "@/lib/types";
 
 export function PortCard({ port }: { port: LiveVesselQueue }) {
+  const { t } = useLocale();
   const hasSignal = port.live_coverage && !port.warming_up;
 
   return (
@@ -19,12 +23,12 @@ export function PortCard({ port }: { port: LiveVesselQueue }) {
             {port.live_coverage ? (
               <Badge tone={hasSignal ? "success" : "neutral"}>
                 <Radio className="h-3 w-3" strokeWidth={2} />
-                {hasSignal ? "Live" : "Connecting"}
+                {hasSignal ? t("live") : t("connecting")}
               </Badge>
             ) : (
               <Badge tone="neutral">
                 <RadioTower className="h-3 w-3" strokeWidth={2} />
-                No live data
+                {t("noLiveData")}
               </Badge>
             )}
           </div>
@@ -34,11 +38,11 @@ export function PortCard({ port }: { port: LiveVesselQueue }) {
               <div className="text-2xl font-semibold tabular-nums text-ink">
                 {port.vessel_queue_length}
               </div>
-              <div className="text-xs text-ink-faint">ships waiting right now</div>
+              <div className="text-xs text-ink-faint">{t("shipsWaitingRightNow")}</div>
             </div>
             <span className="flex items-center gap-1 text-xs font-medium text-accent opacity-0 transition-opacity group-hover:opacity-100">
-              See recommendations
-              <ArrowRight className="h-3.5 w-3.5" />
+              {t("seeRecommendations")}
+              <ArrowRight className="h-3.5 w-3.5 rtl:rotate-180" />
             </span>
           </div>
         </CardBody>

@@ -39,6 +39,7 @@ export interface PortSnapshot {
   berth_occupancy_rate: number;
   vessel_queue_length: number;
   avg_waiting_time_hours: number;
+  language?: "en" | "ar";
 }
 
 export interface Recommendation {

@@ -41,43 +41,53 @@ STALE_AFTER_SECONDS = 8 * 60
 
 RECONNECT_DELAY_SECONDS = 5
 
+EN_LIVE_NOTE = "We are tracking real ship movements near this port right now."
+AR_LIVE_NOTE = "نتابع حركة السفن الحقيقية قرب هذا الميناء الآن."
+
 PORTS = {
     "rotterdam": {
-        "name": "Rotterdam",
-        "country": "Netherlands",
+        "name": {"en": "Rotterdam", "ar": "روتردام"},
+        "country": {"en": "Netherlands", "ar": "هولندا"},
         "bbox": [[51.85, 3.95], [52.00, 4.15]],
         "live_coverage": True,
-        "note": "We are tracking real ship movements near this port right now.",
+        "note": {"en": EN_LIVE_NOTE, "ar": AR_LIVE_NOTE},
     },
     "singapore": {
-        "name": "Singapore",
-        "country": "Singapore",
+        "name": {"en": "Singapore", "ar": "سنغافورة"},
+        "country": {"en": "Singapore", "ar": "سنغافورة"},
         "bbox": [[1.20, 103.60], [1.30, 103.90]],
         "live_coverage": True,
-        "note": "We are tracking real ship movements near this port right now.",
+        "note": {"en": EN_LIVE_NOTE, "ar": AR_LIVE_NOTE},
     },
     "los_angeles": {
-        "name": "Los Angeles / Long Beach",
-        "country": "United States",
+        "name": {"en": "Los Angeles / Long Beach", "ar": "لوس أنجلوس / لونغ بيتش"},
+        "country": {"en": "United States", "ar": "الولايات المتحدة"},
         "bbox": [[33.70, -118.30], [33.79, -118.19]],
         "live_coverage": True,
-        "note": "We are tracking real ship movements near this port right now.",
+        "note": {"en": EN_LIVE_NOTE, "ar": AR_LIVE_NOTE},
     },
     "antwerp": {
-        "name": "Antwerp",
-        "country": "Belgium",
+        "name": {"en": "Antwerp", "ar": "أنتويرب"},
+        "country": {"en": "Belgium", "ar": "بلجيكا"},
         "bbox": [[51.20, 4.20], [51.35, 4.45]],
         "live_coverage": True,
-        "note": "We are tracking real ship movements near this port right now.",
+        "note": {"en": EN_LIVE_NOTE, "ar": AR_LIVE_NOTE},
     },
     "jebel_ali": {
-        "name": "Jebel Ali",
-        "country": "United Arab Emirates",
+        "name": {"en": "Jebel Ali", "ar": "جبل علي"},
+        "country": {"en": "United Arab Emirates", "ar": "الإمارات العربية المتحدة"},
         "bbox": [[24.90, 54.95], [25.05, 55.10]],
         "live_coverage": False,
-        "note": "We don't have live ship-tracking data for this port yet, so this will show 0.",
+        "note": {
+            "en": "We don't have live ship-tracking data for this port yet, so this will show 0.",
+            "ar": "لا تتوفر لدينا بيانات تتبع مباشرة لهذا الميناء بعد، لذا ستظهر القيمة 0.",
+        },
     },
 }
+
+
+def _localized(field: dict, lang: str) -> str:
+    return field.get(lang, field["en"])
 
 
 class AISStreamError(Exception):
@@ -107,7 +117,7 @@ class VesselCache:
             "last_seen": time.monotonic(),
         }
 
-    def snapshot(self, port_id: str, include_positions: bool = False) -> dict:
+    def snapshot(self, port_id: str, include_positions: bool = False, lang: str = "en") -> dict:
         now = time.monotonic()
         fresh = {
             mmsi: v for mmsi, v in self._vessels.get(port_id, {}).items()
@@ -121,15 +131,15 @@ class VesselCache:
 
         result = {
             "port_id": port_id,
-            "port_name": port_info["name"],
-            "country": port_info["country"],
+            "port_name": _localized(port_info["name"], lang),
+            "country": _localized(port_info["country"], lang),
             "live_coverage": port_info["live_coverage"],
             "vessel_queue_length": len(waiting),
             "vessels_observed": len(fresh),
             "source": "aisstream.io",
             "bounding_box": port_info["bbox"],
             "center": [(lat_min + lat_max) / 2, (lon_min + lon_max) / 2],
-            "coverage_note": port_info["note"],
+            "coverage_note": _localized(port_info["note"], lang),
             "connected": self.connected,
             "warming_up": self.connected and (now - self.started_at) < STALE_AFTER_SECONDS,
             "last_error": self.last_error,
@@ -149,8 +159,8 @@ class VesselCache:
 
         return result
 
-    def all_snapshots(self) -> list[dict]:
-        return [self.snapshot(port_id) for port_id in PORTS]
+    def all_snapshots(self, lang: str = "en") -> list[dict]:
+        return [self.snapshot(port_id, lang=lang) for port_id in PORTS]
 
 
 cache = VesselCache()
@@ -211,18 +221,23 @@ def stop_collector():
         _collector_task = None
 
 
-def get_live_vessel_queue(port_id: str, include_positions: bool = False) -> dict:
+def get_live_vessel_queue(port_id: str, include_positions: bool = False, lang: str = "en") -> dict:
     if port_id not in PORTS:
         raise AISStreamError(f"Unknown port_id '{port_id}'. Known ports: {list(PORTS)}")
-    return cache.snapshot(port_id, include_positions=include_positions)
+    return cache.snapshot(port_id, include_positions=include_positions, lang=lang)
 
 
-def get_all_live_vessel_queues() -> list[dict]:
-    return cache.all_snapshots()
+def get_all_live_vessel_queues(lang: str = "en") -> list[dict]:
+    return cache.all_snapshots(lang=lang)
 
 
-def list_ports() -> list[dict]:
+def list_ports(lang: str = "en") -> list[dict]:
     return [
-        {"port_id": port_id, "name": info["name"], "country": info["country"], "live_coverage": info["live_coverage"]}
+        {
+            "port_id": port_id,
+            "name": _localized(info["name"], lang),
+            "country": _localized(info["country"], lang),
+            "live_coverage": info["live_coverage"],
+        }
         for port_id, info in PORTS.items()
     ]

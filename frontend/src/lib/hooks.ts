@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useLocale } from "@/components/LocaleProvider";
 import { api, ApiError } from "./api";
 import type { LiveVesselQueue } from "./types";
 
@@ -13,6 +14,7 @@ interface LiveQueryState<T> {
 }
 
 export function useLiveVesselQueues() {
+  const { locale, t } = useLocale();
   const [state, setState] = useState<LiveQueryState<LiveVesselQueue[]>>({
     data: null,
     loading: true,
@@ -21,16 +23,17 @@ export function useLiveVesselQueues() {
 
   const refresh = useCallback(async () => {
     try {
-      const data = await api.liveVesselQueueAll();
+      const data = await api.liveVesselQueueAll(locale);
       setState({ data, loading: false, error: null });
     } catch (e) {
       setState((prev) => ({
         data: prev.data,
         loading: false,
-        error: e instanceof ApiError ? e.message : "Failed to load live port data",
+        error: e instanceof ApiError ? e.message : t("failedToLoad"),
       }));
     }
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locale]);
 
   useEffect(() => {
     refresh();
@@ -42,6 +45,7 @@ export function useLiveVesselQueues() {
 }
 
 export function useLiveVesselQueue(portId: string, withPositions = false) {
+  const { locale, t } = useLocale();
   const [state, setState] = useState<LiveQueryState<LiveVesselQueue>>({
     data: null,
     loading: true,
@@ -50,16 +54,17 @@ export function useLiveVesselQueue(portId: string, withPositions = false) {
 
   const refresh = useCallback(async () => {
     try {
-      const data = await api.liveVesselQueue(portId, withPositions);
+      const data = await api.liveVesselQueue(portId, withPositions, locale);
       setState({ data, loading: false, error: null });
     } catch (e) {
       setState((prev) => ({
         data: prev.data,
         loading: false,
-        error: e instanceof ApiError ? e.message : "Failed to load live port data",
+        error: e instanceof ApiError ? e.message : t("failedToLoad"),
       }));
     }
-  }, [portId, withPositions]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [portId, withPositions, locale]);
 
   useEffect(() => {
     refresh();

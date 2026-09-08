@@ -24,12 +24,12 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
-  listPorts: () => request<PortSummary[]>("/live/ports"),
-  liveVesselQueue: (portId: string, withPositions = false) =>
+  listPorts: (lang = "en") => request<PortSummary[]>(`/live/ports?lang=${lang}`),
+  liveVesselQueue: (portId: string, withPositions = false, lang = "en") =>
     request<LiveVesselQueue>(
-      `/live/vessel-queue?port=${encodeURIComponent(portId)}${withPositions ? "&positions=true" : ""}`,
+      `/live/vessel-queue?port=${encodeURIComponent(portId)}&lang=${lang}${withPositions ? "&positions=true" : ""}`,
     ),
-  liveVesselQueueAll: () => request<LiveVesselQueue[]>("/live/vessel-queue/all"),
+  liveVesselQueueAll: (lang = "en") => request<LiveVesselQueue[]>(`/live/vessel-queue/all?lang=${lang}`),
   runAdvisory: (snapshot: PortSnapshot) =>
     request<AdvisoryResult>("/advisory", { method: "POST", body: JSON.stringify(snapshot) }),
 };

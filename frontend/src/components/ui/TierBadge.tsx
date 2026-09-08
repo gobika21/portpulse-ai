@@ -1,8 +1,12 @@
+"use client";
+
 import { cn } from "@/lib/cn";
 import { TIER_STYLES } from "@/lib/tier";
+import { useLocale } from "@/components/LocaleProvider";
 import type { CongestionTier } from "@/lib/types";
 
 export function TierBadge({ tier, className }: { tier: CongestionTier; className?: string }) {
+  const { t } = useLocale();
   const style = TIER_STYLES[tier];
   return (
     <span
@@ -13,7 +17,7 @@ export function TierBadge({ tier, className }: { tier: CongestionTier; className
         className,
       )}
     >
-      {style.label}
+      {t(style.labelKey)}
     </span>
   );
 }

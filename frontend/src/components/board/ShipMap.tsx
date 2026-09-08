@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { useLocale } from "@/components/LocaleProvider";
 import type { LiveVesselQueue } from "@/lib/types";
 
 interface ShipMapProps {
@@ -13,6 +14,7 @@ const WAITING_COLOR = "#B5540A"; // tier.high — a ship sitting still
 const MOVING_COLOR = "#1D4E89"; // accent — a ship under way
 
 export function ShipMap({ live }: ShipMapProps) {
+  const { t } = useLocale();
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.LayerGroup | null>(null);
@@ -55,24 +57,26 @@ export function ShipMap({ live }: ShipMapProps) {
         fillOpacity: 0.75,
         weight: 1.5,
       })
-        .bindTooltip(ship.waiting ? "Waiting" : `Moving, ${ship.speed_knots} kn`)
+        .bindTooltip(ship.waiting ? t("waiting") : `${t("moving")}, ${ship.speed_knots} kn`)
         .addTo(layer);
     }
-  }, [live.ships]);
+  }, [live.ships, t]);
 
   return (
-    <div className="overflow-hidden rounded-md border border-border">
-      <div ref={containerRef} style={{ height: 320, width: "100%" }} />
+    <div>
+      <div ref={containerRef} dir="ltr" style={{ height: 260, width: "100%" }} />
       <div className="flex items-center gap-4 border-t border-border bg-sunken px-4 py-2 text-xs text-ink-muted">
         <span className="flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-full" style={{ backgroundColor: WAITING_COLOR }} />
-          Waiting
+          {t("waiting")}
         </span>
         <span className="flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-full" style={{ backgroundColor: MOVING_COLOR }} />
-          Moving
+          {t("moving")}
         </span>
-        <span className="ml-auto">{(live.ships ?? []).length} ships shown</span>
+        <span className="ms-auto">
+          {(live.ships ?? []).length} {t("shipsShown")}
+        </span>
       </div>
     </div>
   );

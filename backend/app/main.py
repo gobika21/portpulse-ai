@@ -48,13 +48,13 @@ def list_scenarios():
 
 
 @app.get("/live/ports")
-def live_ports():
+def live_ports(lang: str = "en"):
     """List of ports tracked by the live board, with whether each has confirmed AIS coverage."""
-    return list_ports()
+    return list_ports(lang=lang)
 
 
 @app.get("/live/vessel-queue")
-def live_vessel_queue(port: str, positions: bool = False):
+def live_vessel_queue(port: str, positions: bool = False, lang: str = "en"):
     """Live vessel-queue proxy via AIS (aisstream.io) for a single port.
 
     Berth occupancy and average waiting time are not publicly exposed by
@@ -69,15 +69,15 @@ def live_vessel_queue(port: str, positions: bool = False):
     small.
     """
     try:
-        return get_live_vessel_queue(port, include_positions=positions)
+        return get_live_vessel_queue(port, include_positions=positions, lang=lang)
     except AISStreamError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
 @app.get("/live/vessel-queue/all")
-def live_vessel_queue_all():
+def live_vessel_queue_all(lang: str = "en"):
     """Live vessel-queue snapshot for every tracked port — powers the board view."""
-    return get_all_live_vessel_queues()
+    return get_all_live_vessel_queues(lang=lang)
 
 
 @app.post("/advisory")
@@ -90,6 +90,7 @@ def advisory(snapshot: PortSnapshot):
     return {
         "tier": result["tier"],
         "tier_reasoning": result["tier_reasoning"],
+        "precedents": result.get("precedents", []),
         "recommendations": result["recommendations"],
         "advisories": result["advisories"],
     }

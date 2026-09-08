@@ -11,4 +11,4 @@ def monitoring_node(state: AdvisoryState) -> AdvisoryState:
     if missing:
         raise ValueError(f"Snapshot missing fields: {missing}")
 
-    return {"snapshot": snapshot}
+    return {"snapshot": snapshot, "language": snapshot.get("language", "en")}

@@ -10,9 +10,13 @@ reference the underlying data point(s) that led to the recommendation. Plain tex
 markdown, no JSON.
 """
 
+ARABIC_INSTRUCTION = "\n\nWrite the advisory message in Modern Standard Arabic."
+
 
 def advisory_drafting_node(state: AdvisoryState) -> AdvisoryState:
     snapshot = state["snapshot"]
+    language = state.get("language", "en")
+    system_prompt = SYSTEM_PROMPT + (ARABIC_INSTRUCTION if language == "ar" else "")
     advisories: dict[str, str] = {}
 
     for rec in state["recommendations"]:
@@ -22,6 +26,6 @@ def advisory_drafting_node(state: AdvisoryState) -> AdvisoryState:
             f"Recommended action: {rec['action']}\n"
             f"Reasoning: {rec['reasoning']}\n"
         )
-        advisories[rec["persona"]] = ask_claude(SYSTEM_PROMPT, user_prompt, max_tokens=300)
+        advisories[rec["persona"]] = ask_claude(system_prompt, user_prompt, max_tokens=300)
 
     return {"advisories": advisories}

@@ -5,10 +5,12 @@ import { PortCard } from "./PortCard";
 import { PortCardSkeleton } from "./PortCardSkeleton";
 import { ErrorBanner } from "@/components/ui/ErrorBanner";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { useLocale } from "@/components/LocaleProvider";
 import { useLiveVesselQueues } from "@/lib/hooks";
 
 export function PortBoard() {
   const { data: ports, loading, error } = useLiveVesselQueues();
+  const { t } = useLocale();
 
   if (error && !ports) {
     return <ErrorBanner message={error} />;
@@ -25,13 +27,7 @@ export function PortBoard() {
   }
 
   if (!ports || ports.length === 0) {
-    return (
-      <EmptyState
-        icon={Sailboat}
-        title="No ports available"
-        description="The backend didn't return any tracked ports."
-      />
-    );
+    return <EmptyState icon={Sailboat} title={t("noPortsTitle")} description={t("noPortsDescription")} />;
   }
 
   return (
