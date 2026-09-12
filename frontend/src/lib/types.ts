@@ -15,6 +15,7 @@ export interface Ship {
   lon: number;
   speed_knots: number;
   waiting: boolean;
+  at_berth: boolean;
 }
 
 export interface LiveVesselQueue {
@@ -23,6 +24,7 @@ export interface LiveVesselQueue {
   country: string;
   live_coverage: boolean;
   vessel_queue_length: number;
+  vessels_at_berth: number;
   vessels_observed: number;
   source: string;
   bounding_box: [[number, number], [number, number]];

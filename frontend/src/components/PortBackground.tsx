@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 // Fixed, full-viewport backdrop: a golden-hour container-terminal photo
 // (frontend/public/port_terminal_sunset_full.png, 1920x1080), covering the
 // whole screen with a dark gradient overlay on top so foreground text stays
@@ -6,11 +8,14 @@
 export function PortBackground() {
   return (
     <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-canvas" aria-hidden="true">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
+      <Image
         src="/port_terminal_sunset_full.png"
         alt=""
-        className="absolute inset-0 h-full w-full object-cover"
+        fill
+        priority
+        quality={65}
+        sizes="100vw"
+        className="object-cover"
       />
       <div
         className="absolute inset-0"

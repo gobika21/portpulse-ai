@@ -22,9 +22,10 @@ export function LiveSignalPanel({ live, children }: { live: LiveVesselQueue; chi
           {t("liveShipTracking")}
         </div>
         <p className="text-xs leading-relaxed text-ink-faint">{live.coverage_note}</p>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           <MetricTile label={t("shipsNearby")} value={live.vessels_observed} />
           <MetricTile label={t("shipsWaiting")} value={live.vessel_queue_length} hint={t("usedBelow")} />
+          <MetricTile label={t("shipsAtBerth")} value={live.vessels_at_berth} />
         </div>
         {live.warming_up && live.live_coverage && (
           <p className="text-xs text-ink-faint">{t("warmingUp")}</p>

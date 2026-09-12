@@ -43,21 +43,38 @@ export function PortAdvisoryView({ portId }: { portId: string }) {
   const [submittedSnapshot, setSubmittedSnapshot] = useState<PortSnapshot | null>(null);
   const [running, setRunning] = useState(false);
   const [runError, setRunError] = useState<string | null>(null);
+  // Bumped on every runAdvisoryFor call so a slow, now-stale request can't overwrite
+  // the result of a newer one that resolved first (matters once language switches can
+  // fire requests back-to-back).
+  const requestIdRef = useRef(0);
+  // Debounces the language-triggered refetch below, so toggling the language switch
+  // rapidly issues one Claude call for the final choice instead of one per click.
+  const localeDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const vesselQueueLength = live?.vessel_queue_length ?? 0;
 
-  // A fetched result is written in whatever language was active at request time —
-  // switching the language afterward can't retroactively translate it, so clear it
-  // rather than leave stale-language AI text under newly-translated UI chrome.
+  // A fetched result is written in whatever language was active at request time.
+  // Rather than clearing it when the language changes, re-run the same snapshot
+  // in the new language so the advisory text updates in place — the old text
+  // stays on screen until the re-translated version arrives.
   const isFirstRender = useRef(true);
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
       return;
     }
-    setResult(null);
-    setSubmittedSnapshot(null);
     setRunError(null);
+    if (!submittedSnapshot) return;
+
+    if (localeDebounceRef.current) clearTimeout(localeDebounceRef.current);
+    localeDebounceRef.current = setTimeout(() => {
+      runAdvisoryFor({ ...submittedSnapshot, language: locale });
+    }, 400);
+
+    return () => {
+      if (localeDebounceRef.current) clearTimeout(localeDebounceRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locale]);
 
   // Manual estimates only need a sane starting point once live data first arrives.
@@ -71,27 +88,32 @@ export function PortAdvisoryView({ portId }: { portId: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [live?.vessels_observed]);
 
-  async function runAdvisory() {
+  async function runAdvisoryFor(snapshot: PortSnapshot) {
+    const requestId = ++requestIdRef.current;
+    setRunning(true);
+    setRunError(null);
+    try {
+      const advisory = await api.runAdvisory(snapshot);
+      if (requestId !== requestIdRef.current) return; // a newer request already resolved
+      setResult(advisory);
+      setSubmittedSnapshot(snapshot);
+    } catch (e) {
+      if (requestId !== requestIdRef.current) return;
+      setRunError(e instanceof ApiError ? e.message : t("somethingWentWrong"));
+    } finally {
+      if (requestId === requestIdRef.current) setRunning(false);
+    }
+  }
+
+  function runAdvisory() {
     if (!live) return;
-    const snapshot: PortSnapshot = {
+    runAdvisoryFor({
       port_name: live.port_name,
       berth_occupancy_rate: fullPercent / 100,
       vessel_queue_length: vesselQueueLength,
       avg_waiting_time_hours: avgWaitHours,
       language: locale,
-    };
-    setRunning(true);
-    setRunError(null);
-    setResult(null);
-    try {
-      const advisory = await api.runAdvisory(snapshot);
-      setResult(advisory);
-      setSubmittedSnapshot(snapshot);
-    } catch (e) {
-      setRunError(e instanceof ApiError ? e.message : t("somethingWentWrong"));
-    } finally {
-      setRunning(false);
-    }
+    });
   }
 
   if (liveLoading && !live) {
@@ -181,7 +203,7 @@ export function PortAdvisoryView({ portId }: { portId: string }) {
           </Card>
 
           <div>
-            <div className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-faint">
+            <div className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-muted">
               {t("whatEachGroupShouldDo")}
             </div>
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">

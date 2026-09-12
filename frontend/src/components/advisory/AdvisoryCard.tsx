@@ -1,7 +1,9 @@
 "use client";
 
-import { Ship, Truck, Warehouse, type LucideIcon } from "lucide-react";
+import { useState } from "react";
+import { ChevronDown, Ship, Truck, Warehouse, type LucideIcon } from "lucide-react";
 import { Card, CardBody } from "@/components/ui/Card";
+import { cn } from "@/lib/cn";
 import { PERSONA_LABEL_KEYS, PERSONA_SUBTITLE_KEYS } from "@/lib/tier";
 import { useLocale } from "@/components/LocaleProvider";
 import type { Persona, Recommendation } from "@/lib/types";
@@ -19,6 +21,7 @@ interface AdvisoryCardProps {
 
 export function AdvisoryCard({ recommendation, message }: AdvisoryCardProps) {
   const { t } = useLocale();
+  const [showWhy, setShowWhy] = useState(false);
   const Icon = PERSONA_ICONS[recommendation.persona];
 
   return (
@@ -36,10 +39,18 @@ export function AdvisoryCard({ recommendation, message }: AdvisoryCardProps) {
           </div>
         </div>
         <p className="text-sm leading-relaxed text-ink-muted">{message}</p>
-        <p className="border-t border-border pt-3 text-xs leading-relaxed text-ink-faint">
-          <span className="font-medium text-ink-muted">{t("why")}</span>
-          {recommendation.reasoning}
-        </p>
+        <button
+          type="button"
+          onClick={() => setShowWhy((v) => !v)}
+          aria-expanded={showWhy}
+          className="flex items-center gap-1 self-start rounded-sm border-t border-border pt-3 text-xs font-medium text-ink-faint hover:text-ink-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
+          {t("why")}
+          <ChevronDown className={cn("h-3 w-3 transition-transform", showWhy && "rotate-180")} />
+        </button>
+        {showWhy && (
+          <p className="text-xs leading-relaxed text-ink-faint">{recommendation.reasoning}</p>
+        )}
       </CardBody>
     </Card>
   );

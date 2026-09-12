@@ -10,8 +10,9 @@ interface ShipMapProps {
   live: LiveVesselQueue;
 }
 
-const WAITING_COLOR = "#B5540A"; // tier.high — a ship sitting still
-const MOVING_COLOR = "#1D4E89"; // accent — a ship under way
+const WAITING_COLOR = "#B5540A"; // tier.high — anchored, waiting for a berth
+const MOVING_COLOR = "#1D4E89"; // accent — under way
+const BERTHED_COLOR = "#4ADE80"; // tier.low — moored at berth
 
 export function ShipMap({ live }: ShipMapProps) {
   const { t } = useLocale();
@@ -49,7 +50,8 @@ export function ShipMap({ live }: ShipMapProps) {
 
     layer.clearLayers();
     for (const ship of live.ships ?? []) {
-      const color = ship.waiting ? WAITING_COLOR : MOVING_COLOR;
+      const color = ship.at_berth ? BERTHED_COLOR : ship.waiting ? WAITING_COLOR : MOVING_COLOR;
+      const label = ship.at_berth ? t("atBerth") : ship.waiting ? t("waiting") : `${t("moving")}, ${ship.speed_knots} kn`;
       L.circleMarker([ship.lat, ship.lon], {
         radius: 5,
         color,
@@ -57,7 +59,7 @@ export function ShipMap({ live }: ShipMapProps) {
         fillOpacity: 0.75,
         weight: 1.5,
       })
-        .bindTooltip(ship.waiting ? t("waiting") : `${t("moving")}, ${ship.speed_knots} kn`)
+        .bindTooltip(label)
         .addTo(layer);
     }
   }, [live.ships, t]);
@@ -65,7 +67,11 @@ export function ShipMap({ live }: ShipMapProps) {
   return (
     <div>
       <div ref={containerRef} dir="ltr" style={{ height: 260, width: "100%" }} />
-      <div className="flex items-center gap-4 border-t border-border bg-sunken px-4 py-2 text-xs text-ink-muted">
+      <div className="flex flex-wrap items-center gap-4 border-t border-border bg-sunken px-4 py-2 text-xs text-ink-muted">
+        <span className="flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full" style={{ backgroundColor: BERTHED_COLOR }} />
+          {t("atBerth")}
+        </span>
         <span className="flex items-center gap-1.5">
           <span className="h-2 w-2 rounded-full" style={{ backgroundColor: WAITING_COLOR }} />
           {t("waiting")}

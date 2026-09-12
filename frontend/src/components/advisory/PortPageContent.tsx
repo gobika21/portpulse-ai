@@ -5,7 +5,6 @@ import { ArrowLeft } from "lucide-react";
 import { Container } from "@/components/Container";
 import { PageHeading } from "@/components/PageHeading";
 import { PortAdvisoryView } from "@/components/advisory/PortAdvisoryView";
-import { TierLegend } from "@/components/board/TierLegend";
 import { useLocale } from "@/components/LocaleProvider";
 
 export function PortPageContent({ portId }: { portId: string }) {
@@ -25,7 +24,6 @@ export function PortPageContent({ portId }: { portId: string }) {
         title={t("portStatusTitle")}
         description={t("portStatusDescription")}
       />
-      <TierLegend />
       <PortAdvisoryView portId={portId} />
     </Container>
   );
