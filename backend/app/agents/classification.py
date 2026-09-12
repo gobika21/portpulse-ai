@@ -68,4 +68,4 @@ def classification_node(state: AdvisoryState) -> AdvisoryState:
 
     reasoning = REASONING_JOIN[language].format(summary=TIER_SUMMARY[language][overall_tier], facts=driving_facts)
 
-    return {"tier": overall_tier, "tier_reasoning": reasoning}
+    return {"tier": overall_tier, "tier_reasoning": reasoning, "driving_metrics": driving_metrics}

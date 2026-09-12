@@ -36,6 +36,7 @@ class AdvisoryState(TypedDict, total=False):
     language: Language
     tier: CongestionTier
     tier_reasoning: str
+    driving_metrics: list[str]
     precedents: list[Precedent]
     recommendations: list[Recommendation]
     advisories: dict[Persona, str]

@@ -14,7 +14,10 @@ from app.rag.corpus import PRECEDENTS, Precedent
 
 _WORD_RE = re.compile(r"[a-z]+")
 
-TIER_MATCH_BOOST = 0.25
+# Kept small relative to typical term-overlap scores (roughly 0.05-0.2 once the
+# query includes real domain keywords) so a same-tier precedent is preferred on
+# a tie, without letting the boost alone decide the ranking regardless of content.
+TIER_MATCH_BOOST = 0.08
 
 
 def _tokenize(text: str) -> Counter:
