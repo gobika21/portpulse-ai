@@ -10,7 +10,7 @@ const LocaleContext = createContext<{
   t: (key: Parameters<typeof translate>[1]) => string;
 } | null>(null);
 
-const STORAGE_KEY = "portpulse-locale";
+const STORAGE_KEY = "berthiq-locale";
 
 export function LocaleProvider({ children }: { children: React.ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>("en");

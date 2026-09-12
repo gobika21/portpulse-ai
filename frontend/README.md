@@ -1,6 +1,6 @@
-# PortPulse — Web
+# BerthIQ — Web
 
-Next.js (App Router, TypeScript, Tailwind) dashboard for the PortPulse congestion advisory pipeline.
+Next.js (App Router, TypeScript, Tailwind) dashboard for the BerthIQ congestion advisory pipeline.
 
 ## Structure
 
@@ -25,7 +25,7 @@ src/
 
 ```bash
 npm install
-cp .env.local.example .env.local   # set NEXT_PUBLIC_PORTPULSE_API_URL if not using the default
+cp .env.local.example .env.local   # set NEXT_PUBLIC_BERTHIQ_API_URL if not using the default
 npm run dev
 ```
 

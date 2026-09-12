@@ -8,7 +8,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "PortPulse — Port Traffic Reports",
+  title: "BerthIQ — Port Traffic Reports",
   description: "See which major ports are backed up right now, and get plain-English advice on what to do about it.",
 };
 

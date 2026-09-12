@@ -1,6 +1,6 @@
 import type { AdvisoryResult, LiveVesselQueue, PortSnapshot, PortSummary } from "./types";
 
-const API_URL = process.env.NEXT_PUBLIC_PORTPULSE_API_URL ?? "http://localhost:8000";
+const API_URL = process.env.NEXT_PUBLIC_BERTHIQ_API_URL ?? "http://localhost:8000";
 
 export class ApiError extends Error {}
 
@@ -12,7 +12,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
       headers: { "Content-Type": "application/json", ...init?.headers },
     });
   } catch {
-    throw new ApiError(`Could not reach the PortPulse backend at ${API_URL}`);
+    throw new ApiError(`Could not reach the BerthIQ backend at ${API_URL}`);
   }
 
   if (!res.ok) {

@@ -1,4 +1,4 @@
-# PortPulse AI — Congestion Advisory System
+# BerthIQ — Congestion Advisory System
 
 A multi-agent system that turns port congestion signals into stakeholder-specific decisions — not just a prediction, but a recommendation with reasoning shown.
 

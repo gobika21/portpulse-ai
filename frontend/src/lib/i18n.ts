@@ -14,7 +14,7 @@ type Dict = Record<string, string>;
 
 export const TRANSLATIONS: Record<Locale, Dict> = {
   en: {
-    appName: "PortPulse",
+    appName: "BerthIQ",
     tagline: "Port Traffic Reports",
     toggleLanguage: "Switch language",
 
@@ -38,22 +38,20 @@ export const TRANSLATIONS: Record<Locale, Dict> = {
       "We look at how many ships are waiting, check how serious it is, and write specific advice for the people who deal with this every day.",
 
     tierLow: "Low",
-    tierLowDesc: "moving smoothly",
     tierMedium: "Medium",
-    tierMediumDesc: "starting to slow down",
     tierHigh: "High",
-    tierHighDesc: "real delays",
     tierCritical: "Critical",
-    tierCriticalDesc: "major delays",
 
     liveShipTracking: "Live ship tracking",
     shipsNearby: "Ships nearby",
     shipsWaiting: "Ships waiting",
+    shipsAtBerth: "Ships at berth",
     usedBelow: "Used below — from live tracking",
     warmingUp:
       "We just started watching this port, so the count of waiting ships will fill in over the next couple of minutes.",
     waiting: "Waiting",
     moving: "Moving",
+    atBerth: "At berth",
     shipsShown: "ships shown",
 
     fillInWhatYouKnow: "Fill in what you know",
@@ -64,7 +62,7 @@ export const TRANSLATIONS: Record<Locale, Dict> = {
     getRecommendations: "Get recommendations",
 
     whatEachGroupShouldDo: "What each group should do",
-    why: "Why — ",
+    why: "Why?",
 
     personaCarrier: "Shipping Company",
     personaCarrierSub: "Owns or runs the ships",
@@ -84,7 +82,7 @@ export const TRANSLATIONS: Record<Locale, Dict> = {
     somethingWentWrong: "Something went wrong while getting recommendations.",
   },
   ar: {
-    appName: "بورت بالس",
+    appName: "BerthIQ",
     tagline: "تقارير حركة الموانئ",
     toggleLanguage: "تغيير اللغة",
 
@@ -108,21 +106,19 @@ export const TRANSLATIONS: Record<Locale, Dict> = {
       "ننظر إلى عدد السفن المنتظرة، ونحدد مدى خطورة الوضع، ونكتب نصائح محددة للأشخاص الذين يتعاملون مع هذا يوميًا.",
 
     tierLow: "منخفض",
-    tierLowDesc: "الحركة سلسة",
     tierMedium: "متوسط",
-    tierMediumDesc: "بدأ التباطؤ",
     tierHigh: "مرتفع",
-    tierHighDesc: "تأخير حقيقي",
     tierCritical: "حرج",
-    tierCriticalDesc: "تأخير كبير",
 
     liveShipTracking: "تتبع السفن المباشر",
     shipsNearby: "السفن القريبة",
     shipsWaiting: "السفن المنتظرة",
+    shipsAtBerth: "السفن الراسية",
     usedBelow: "تُستخدم أدناه — من التتبع المباشر",
     warmingUp: "بدأنا للتو بمراقبة هذا الميناء، لذا سيكتمل عدد السفن المنتظرة خلال الدقائق القليلة القادمة.",
     waiting: "منتظرة",
     moving: "متحركة",
+    atBerth: "راسية",
     shipsShown: "سفينة معروضة",
 
     fillInWhatYouKnow: "أدخل ما تعرفه",
@@ -133,7 +129,7 @@ export const TRANSLATIONS: Record<Locale, Dict> = {
     getRecommendations: "احصل على التوصيات",
 
     whatEachGroupShouldDo: "ما الذي يجب أن تفعله كل جهة",
-    why: "السبب — ",
+    why: "لماذا؟",
 
     personaCarrier: "شركة الشحن",
     personaCarrierSub: "تمتلك السفن أو تديرها",
